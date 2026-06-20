@@ -1,10 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ArticleController;
 
 /*
 |--------------------------------------------------------------------------
-| Trang chủ
+| HOME
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
@@ -13,7 +16,7 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Giới thiệu
+| ABOUT
 |--------------------------------------------------------------------------
 */
 Route::get('/about', function () {
@@ -22,7 +25,7 @@ Route::get('/about', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Liên hệ
+| CONTACT
 |--------------------------------------------------------------------------
 */
 Route::get('/contact', function () {
@@ -31,73 +34,48 @@ Route::get('/contact', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Dữ liệu mẫu bài viết
+| ARTICLES
 |--------------------------------------------------------------------------
 */
-$articles = [
-    [
-        'id' => 1,
-        'title' => 'Giới thiệu Laravel',
-        'author' => 'Phú Xuân',
-        'date' => '20/06/2026',
-        'content' => 'Laravel là framework PHP phổ biến nhất hiện nay.'
-    ],
-    [
-        'id' => 2,
-        'title' => 'Blade Template Engine',
-        'author' => 'Nguyễn Văn A',
-        'date' => '21/06/2026',
-        'content' => 'Blade giúp xây dựng giao diện nhanh và gọn gàng.'
-    ],
-];
+Route::get('/articles', function (Request $request) {
 
-/*
-|--------------------------------------------------------------------------
-| Danh sách bài viết
-|--------------------------------------------------------------------------
-*/
-Route::get('/articles', function () use ($articles) {
-    return view('articles.index', compact('articles'));
+    $articles = [
+        ['title' => 'AI phát triển', 'category' => 'Công nghệ'],
+        ['title' => 'Vũ trụ mới', 'category' => 'Khoa học'],
+        ['title' => 'Kinh tế 2026', 'category' => 'Kinh doanh'],
+    ];
+
+    $category = $request->query('category');
+
+    if ($category) {
+        $articles = array_filter($articles, function ($item) use ($category) {
+            return $item['category'] === $category;
+        });
+    }
+
+    return view('articles.index', compact('articles', 'category'));
+
 })->name('articles.index');
 
 /*
 |--------------------------------------------------------------------------
-| Chi tiết bài viết
+| CATEGORIES (CRUD)
 |--------------------------------------------------------------------------
 */
-Route::get('/articles/{id}', function ($id) use ($articles) {
-
-    $article = collect($articles)->firstWhere('id', $id);
-
-    if (!$article) {
-        abort(404);
-    }
-
-    return view('articles.show', compact('article'));
-
-})->name('articles.show');
+Route::resource('categories', CategoryController::class);
 
 /*
 |--------------------------------------------------------------------------
-| Form tạo bài viết
+| SHOP
 |--------------------------------------------------------------------------
 */
-Route::get('/articles/create', function () {
-    return view('articles.create');
-})->name('articles.create');
-
-/*
-|--------------------------------------------------------------------------
-| Shop
-|--------------------------------------------------------------------------
-*/
-Route::get('/shop/products', function () {
+Route::get('/products', function () {
 
     $products = [
         'Laptop Dell',
-        'Bàn phím cơ',
-        'Chuột Gaming',
-        'Tai nghe Bluetooth'
+        'iPhone 15',
+        'Tai nghe Bluetooth',
+        'Chuột Logitech',
     ];
 
     return view('shop.products', compact('products'));

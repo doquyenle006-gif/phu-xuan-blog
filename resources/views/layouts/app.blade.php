@@ -32,9 +32,10 @@
         }
     </style>
 </head>
+
 <body>
 
- @include('components.navbar') 
+@include('components.navbar')
 
 @if(View::hasSection('page-header'))
 <div class="page-header">

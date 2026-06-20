@@ -45,7 +45,7 @@
                     Khám phá sản phẩm trong cửa hàng online.
                 </p>
 
-                <a href="{{ route('shop.products') }}"
+                <a href="{{ url('/products') }}"
                    class="btn btn-success btn-sm">
                     Mua sắm
                 </a>
