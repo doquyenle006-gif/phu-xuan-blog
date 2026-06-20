@@ -1,0 +1,1 @@
+﻿{"app_env":"local","app_debug":true,"app_key_set":true,"app_key":"base64:RTUk2NlrsGj7yjub4Q5G7w0xffME8mHPn41MOWAR2GE=","php_version":"8.3.30"}
