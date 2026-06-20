@@ -1,20 +1,26 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Danh sách bài viết</title>
+    <title>Articles</title>
 </head>
 <body>
 
-<h1>Danh sách bài viết</h1>
+<h1>Articles</h1>
 
-@foreach($articles as $article)
-    <p>
-        <a href="{{ route('articles.show', $article['id']) }}">
-            {{ $article['title'] }}
-        </a>
-    </p>
+<form method="GET">
+    <select name="category" onchange="this.form.submit()">
+        <option value="">All</option>
+        <option value="Công nghệ">Công nghệ</option>
+        <option value="Khoa học">Khoa học</option>
+        <option value="Kinh doanh">Kinh doanh</option>
+    </select>
+</form>
+
+<ul>
+@foreach($articles as $a)
+    <li>{{ $a['title'] }} - {{ $a['category'] }}</li>
 @endforeach
+</ul>
 
 </body>
 </html>
