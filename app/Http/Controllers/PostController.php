@@ -2,74 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
+use App\Models\Post;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PostController extends Controller
 {
     /**
-     * Return a collection of fake posts (as objects)
-     */
-    protected function getFakePosts()
-    {
-        return collect([
-            (object)[
-                'id'         => 1,
-                'title'      => 'Giới thiệu Laravel Framework',
-                'body'       => 'Laravel là PHP framework theo kiến trúc MVC, được Taylor Otwell tạo ra năm 2011. Nó cung cấp công cụ giúp xây dựng ứng dụng web nhanh chóng và bảo mật.',
-                'author'     => 'Nguyễn Văn An',
-                'status'     => 'published',
-                'created_at' => now()->subDays(5),
-            ],
-            (object)[
-                'id'         => 2,
-                'title'      => 'Blade Template Engine là gì?',
-                'body'       => 'Blade là template engine của Laravel, cho phép viết giao diện HTML với cú pháp ngắn gọn. Blade tự động escape dữ liệu để chống tấn công XSS.',
-                'author'     => 'Trần Thị Bình',
-                'status'     => 'published',
-                'created_at' => now()->subDays(2),
-            ],
-            (object)[
-                'id'         => 3,
-                'title'      => 'Eloquent ORM – làm việc với database',
-                'body'       => 'Eloquent là Object-Relational Mapping (ORM) của Laravel. Mỗi bảng trong database tương ứng với một Model class trong PHP.',
-                'author'     => 'Lê Văn Cường',
-                'status'     => 'draft',
-                'created_at' => now()->subDay(),
-            ],
-            (object)[
-                'id'         => 4,
-                'title'      => 'RESTful API với Laravel Sanctum',
-                'body'       => 'Xây dựng API chuẩn REST, bảo vệ bằng Sanctum token. API trả về JSON, phân tách hoàn toàn frontend và backend.',
-                'author'     => 'Phạm Thị Dung',
-                'status'     => 'published',
-                'created_at' => now(),
-            ],
-            (object)[
-                'id'         => 5,
-                'title'      => 'Bảo trì: Lưu trữ bài viết',
-                'body'       => 'Bài viết đã được lưu trữ trong kho lưu trữ nội dung.',
-                'author'     => 'Admin',
-                'status'     => 'archived',
-                'created_at' => now()->subDays(10),
-            ],
-            (object)[
-                'id'         => 6,
-                'title'      => 'Trạng thái lạ',
-                'body'       => 'Bài viết với trạng thái không xác định để test component.',
-                'author'     => 'Tester',
-                'status'     => 'unknown',
-                'created_at' => now()->subDays(3),
-            ],
-        ]);
-    }
-
-    /**
      * Hiển thị danh sách bài viết
      */
-    public function index()
+    public function index(): View
     {
-        $posts = $this->getFakePosts();
-        $totalPosts = $posts->count();
+        $posts = Post::latest()->paginate(10);
+        $totalPosts = Post::count();
 
         return view('posts.index', compact('posts', 'totalPosts'));
     }
@@ -83,33 +30,56 @@ class PostController extends Controller
     }
 
     /**
-     * Lưu bài viết (fake) — chỉ redirect
+     * Lưu bài viết
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request): RedirectResponse
     {
-        // Không lưu thực tế (chưa có DB) — mô phỏng
-        return redirect()->route('posts.index')->with('success', 'Bài viết đã được tạo (giả)!');
+        $post = Post::create($request->validated() + [
+            'user_id' => 1,
+            'author'  => 'Admin',
+            'status'  => 'draft',
+        ]);
+
+        return redirect()->route('posts.show', $post)
+            ->with('success', 'Tạo bài viết thành công!');
+    }
+
+    /**
+     * Hiển thị form chỉnh sửa bài viết
+     */
+    public function edit(Post $post)
+    {
+        return view('posts.edit', compact('post'));
+    }
+
+    /**
+     * Cập nhật bài viết
+     */
+    public function update(UpdatePostRequest $request, Post $post): RedirectResponse
+    {
+        $post->update($request->validated());
+
+        return redirect()->route('posts.show', $post)
+            ->with('success', 'Cập nhật bài viết thành công!');
     }
 
     /**
      * Hiển thị chi tiết 1 bài viết
      */
-    public function show($id)
+    public function show(Post $post)
     {
-        $post = $this->getFakePosts()->firstWhere('id', (int) $id);
-
-        if (! $post) {
-            abort(404, 'Bài viết không tồn tại');
-        }
-
         return view('posts.show', compact('post'));
     }
 
     /**
-     * Xóa bài (fake) — chỉ redirect
+     * Xóa bài viết
      */
-    public function destroy($id)
+    public function destroy(Post $post): RedirectResponse
     {
-        return redirect()->route('posts.index')->with('success', 'Bài viết đã bị xóa (giả).');
+        $title = $post->title;
+        $post->delete();
+
+        return redirect()->route('posts.index')
+            ->with('success', 'Đã xóa bài viết: ' . $title);
     }
 }

@@ -23,19 +23,19 @@
 
                 <div class="mb-3 text-muted">
                     👤 {{ $post->author }} · 📅 {{ $post->created_at->format('d/m/Y H:i') }}
-<x-badge :status="$post->status" class="ms-2" />
+                    <x-badge :status="$post->status" class="ms-2" />
                 </div>
 
                 <div class="mt-4">
-                    {{ $post->body }}
+                    {{ $post->content }}
                 </div>
             </div>
         </div>
 
         <div class="d-flex gap-2">
             <a href="{{ route('posts.index') }}" class="btn btn-outline-secondary">← Quay lại danh sách</a>
-            <a href="#" class="btn btn-outline-primary">✏ Sửa bài</a>
-            <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Xác nhận xóa bài viết này?');">
+            <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-outline-primary">✏ Sửa bài</a>
+            <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirmDelete('{{ $post->title }}');">
                 @csrf
                 @method('DELETE')
                 <button class="btn btn-danger">🗑 Xóa</button>
