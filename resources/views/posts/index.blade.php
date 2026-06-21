@@ -1,58 +1,56 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Danh sách bài viết - Phú Xuân Blog</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<div class="container mt-4">
-    <h2 class="text-center mb-4">📘 Danh sách bài viết</h2>
-    <p class="text-center">Tổng số bài viết: <b>{{ count($posts) }}</b></p>
-    <div class="row">
-        @foreach ($posts as $post)
-            <div class="col-md-4 mb-3">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5>{{ $post['title'] }}</h5>
-                        <p class="text-muted mb-3">
-                            👤 {{ $post['author'] }}<br>
-                            📅 {{ $post['date'] }}
-                        </p>
-                        <p>{{ $post['excerpt'] }}</p>
-                        <a href="/posts/{{ $post['id'] }}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+@extends('layouts.app')
+
+@section('title', 'Danh sách bài viết | Phú Xuân Blog')
+
+@section('content')
+
+@php use Illuminate\Support\Str; @endphp
+
+{{-- Header: title + total count + create button --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">📰 Danh sách bài viết</h1>
+        <div class="text-muted">Tổng cộng {{ $totalPosts }} bài viết</div>
+    </div>
+    <a href="{{ route('posts.create') }}" class="btn btn-primary">✏ Viết bài mới</a>
+</div>
+
+@forelse ($posts as $post)
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <strong>#{{ $loop->iteration }}</strong>
+                    <a href="{{ route('posts.show', $post->id) }}" class="ms-2 h5">{{ $post->title }}</a>
+                    <div class="text-muted">{{ Str::limit($post->body, 100) }}</div>
+                    <div class="mt-2 text-muted">👤 {{ $post->author }} · 📅 {{ $post->created_at->diffForHumans() }}</div>
+                </div>
+
+                <div class="text-end">
+                    <x-badge :status="$post->status" />
+
+                    <div class="mt-3">
+                        <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-outline-primary">👁 Xem</a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary">✏ Sửa</a>
+                        <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận xóa?');">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-outline-danger">🗑 Xóa</button>
+                        </form>
                     </div>
                 </div>
             </div>
-        @endforeach
+        </div>
     </div>
-</div>
-<h1>Categories</h1>
 
-<ul>
-@foreach($categories as $cat)
-    <li>
-        <a href="{{ route('categories.show', $cat['id']) }}">
-            {{ $cat['name'] }}
-        </a>
-    </li>
-@endforeach
-</ul>
-<h1>Articles</h1>
+    @if ($loop->last)
+        <div class="text-center text-muted my-4">— Đã hiển thị tất cả {{ $loop->count }} bài viết —</div>
+    @endif
 
-<form method="GET">
-    <select name="category" onchange="this.form.submit()">
-        <option value="">All</option>
-        <option value="Công nghệ">Công nghệ</option>
-        <option value="Khoa học">Khoa học</option>
-        <option value="Kinh doanh">Kinh doanh</option>
-    </select>
-</form>
+@empty
+    <div class="alert alert-info">
+        📭 Chưa có bài viết nào. <a href="{{ route('posts.create') }}">✏ Viết bài đầu tiên</a>
+    </div>
+@endforelse
 
-<ul>
-@foreach($articles as $a)
-    <li>{{ $a['title'] }} - {{ $a['category'] }}</li>
-@endforeach
-</ul>
-</body>
-</html>
+@endsection
