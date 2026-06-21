@@ -22,7 +22,7 @@
                 <div>
                     <strong>#{{ $loop->iteration }}</strong>
                     <a href="{{ route('posts.show', $post->id) }}" class="ms-2 h5">{{ $post->title }}</a>
-                    <div class="text-muted">{{ Str::limit($post->body, 100) }}</div>
+                    <div class="text-muted">{{ Str::limit($post->content, 100) }}</div>
                     <div class="mt-2 text-muted">👤 {{ $post->author }} · 📅 {{ $post->created_at->diffForHumans() }}</div>
                 </div>
 
@@ -31,8 +31,8 @@
 
                     <div class="mt-3">
                         <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-outline-primary">👁 Xem</a>
-                        <a href="#" class="btn btn-sm btn-outline-secondary">✏ Sửa</a>
-                        <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận xóa?');">
+                        <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-sm btn-outline-secondary">✏ Sửa</a>
+                        <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-inline" onsubmit="return confirmDelete('{{ $post->title }}');">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-outline-danger">🗑 Xóa</button>
@@ -44,7 +44,7 @@
     </div>
 
     @if ($loop->last)
-        <div class="text-center text-muted my-4">— Đã hiển thị tất cả {{ $loop->count }} bài viết —</div>
+        <div class="text-center text-muted my-4">— Đã hiển thị tất cả {{ $loop->count }} bài viết trên trang này —</div>
     @endif
 
 @empty
@@ -52,5 +52,11 @@
         📭 Chưa có bài viết nào. <a href="{{ route('posts.create') }}">✏ Viết bài đầu tiên</a>
     </div>
 @endforelse
+
+@if ($posts->hasPages())
+    <div class="mt-4 d-flex justify-content-center">
+        {{ $posts->links() }}
+    </div>
+@endif
 
 @endsection
