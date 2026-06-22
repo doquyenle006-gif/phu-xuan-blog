@@ -29,6 +29,26 @@
                 <div class="mt-4">
                     {{ $post->content }}
                 </div>
+                <hr class="my-4">
+
+<h3>💬 Bình luận ({{ $post->comments->count() }})</h3>
+
+@forelse($post->approvedComments as $comment)
+    <div class="border rounded p-2 mb-2">
+        <div class="d-flex justify-content-between">
+            <strong>{{ $comment->user?->name }}</strong>
+            <small class="text-muted">
+                {{ $comment->created_at->diffForHumans() }}
+            </small>
+        </div>
+
+        <div>
+            {{ $comment->body }}
+        </div>
+    </div>
+@empty
+    <p class="text-muted">Chưa có bình luận nào.</p>
+@endforelse
             </div>
         </div>
 
