@@ -27,10 +27,6 @@
                 }, 5000);
             });
         });
-
-        function confirmDelete(title) {
-            return confirm('Xác nhận xóa bài viết: ' + title + '?');
-        }
     </script>
 </body>
 </html>
